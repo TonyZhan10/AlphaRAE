@@ -5,3 +5,5 @@
 - **DINOv3** — Meta Platforms, Inc. and affiliates, https://github.com/facebookresearch/dinov3. ViT-L, attention/MLP layers and the runtime tensor helpers are retained under `third_party/dinov3`. Its `LICENSE.md` is retained verbatim. Model/training registries and unrelated utilities are omitted from the runtime subset. The model source files retain their copyright notices.
 
 Model weights keep their original licenses. Root-level licensing does not grant additional rights to upstream code, pretrained weights, or image corpora. The release does not include the original data collections, private preference-study records, or authentication material.
+
+Training initialization also uses the Torchvision AlexNet trunk, Richard Zhang and collaborators' LPIPS calibration weights, and IQA-PyTorch for the paired evaluation implementation. Their license notices are provided with the downloadable training assets under `weights/training/`. IQA-PyTorch required notice: Copyright (c) 2022 Chaofeng Chen. These caches serve reconstruction losses and validation; no text-conditioned generator is included.

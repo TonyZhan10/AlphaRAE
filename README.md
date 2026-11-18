@@ -69,32 +69,55 @@ See [data/README.md](data/README.md) for the RGBA and RGB replay manifest format
 
 ## Codec training
 
-The original eight-GPU configuration uses batch 1 per rank, global batch 8, full decoder training and 50,000 optimizer updates. Training additionally needs the matching RGB decoder initializer, a DINOv3-L checkpoint and the data paths specified in the configuration. These training assets are separate from the self-contained inference downloads.
+Install the training dependencies once:
 
 ```bash
-python -m pip install -e '.[evaluation]'
-python -m torch.distributed.run --standalone --nproc_per_node=8 -m scripts.train_codec --config configs/codec_k7.yaml --output outputs/codec_k7
-python -m torch.distributed.run --standalone --nproc_per_node=8 -m scripts.train_codec --config configs/codec_k23.yaml --output outputs/codec_k23
+python -m pip install -e '.[training]'
 ```
 
-For another number of ranks, adjust `batch_size`, `effective_batch_size` and `planned_world_size` together. Resume with the same configuration and world size:
+With your data manifests at `data/rgba_manifest.jsonl` and `data/rgb_replay.jsonl`, download the original initialization and start training without editing YAML:
 
 ```bash
-python -m torch.distributed.run --standalone --nproc_per_node=8 -m scripts.train_codec --config configs/codec_k7.yaml --output outputs/codec_k7 --resume outputs/codec_k7/last.pt
+python -m scripts.download_training_weights --codec k7
+python -m scripts.launch_train --codec k7 --gpus 8
 ```
 
-Before a full job, the startup check performs two real updates, saves, resumes to update three, and checks gradients and parameter changes:
+Use `--codec k23` in both commands for 1024-pixel training. Omit `--codec` from the downloader to prepare both configurations. The files are saved under `weights/training/`: the matching RGB decoder EMA, frozen DINOv3 encoder, AlexNet trunk and LPIPS calibration. All downloads are public and require no token. On offline GPU nodes, prepare the weights on a connected machine and copy the full `weights/` directory before launching.
+
+The launcher defaults to one GPU. `--gpus 8` with batch 1 per GPU retains the paper's global batch 8; `--gpus 1` runs the same reconstruction objective with a smaller global batch. It uses the original RGB initialization, not the final RGBA checkpoint. By default, training runs 50,000 updates with the original learning rates, input mixture and loss weights. Online PSNR/SSIM/LPIPS validation is enabled; its network weights are included in the training download. Initial validation runs before the first optimizer update, and `status.json` records progress.
+
+For data/output paths elsewhere:
 
 ```bash
-python -m scripts.smoke_codec --config configs/codec_k7.yaml --output outputs/smoke_k7
-python -m scripts.smoke_codec --config configs/codec_k23.yaml --output outputs/smoke_k23
+python -m scripts.launch_train --codec k7 --gpus 8 --manifest /data/rgba.jsonl --rgb-replay-manifest /data/rgb_replay.jsonl --output outputs/my_k7
 ```
 
-Export a trained checkpoint to the portable inference format:
+A short startup check uses a small subset of your real data and stops after two optimizer updates:
 
 ```bash
-python -m scripts.export_reconstruction --checkpoint outputs/codec_k7/last.pt --output weights/codec_k7.pt
+python -m scripts.launch_train --codec k7 --gpus 8 --smoke --output outputs/smoke_k7
 ```
+
+Resume that check to update three:
+
+```bash
+python -m scripts.launch_train --codec k7 --gpus 8 --smoke --steps 3 --output outputs/smoke_k7 --resume outputs/smoke_k7/last.pt
+```
+
+For a normal run, resume with the same data, GPU count, batch size and output, without `--smoke`:
+
+```bash
+python -m scripts.launch_train --codec k7 --gpus 8 --resume outputs/codec_k7/last.pt
+```
+
+Export your trained checkpoint and reconstruct with it:
+
+```bash
+python -m scripts.export_reconstruction --checkpoint outputs/codec_k7/last.pt --output outputs/codec_k7/export/codec_k7.pt
+python -m scripts.infer --codec k7 --weights-dir outputs/codec_k7/export --input examples/rgba.png --output outputs/codec_k7/reconstruction
+```
+
+The underlying YAML configurations and `scripts.train_codec` entrypoint remain available for direct torchrun use. The startup check is not a rerun of the complete 50k training budget.
 
 ## Verification and attribution
 

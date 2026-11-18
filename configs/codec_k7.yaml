@@ -7,8 +7,8 @@ manifest: data/rgba_manifest.jsonl
 encoder:
   kind: dinov3l_k7
   resolution: 256
-  weights: weights/dinov3
-pretrained_decoder: weights/rgb_k7_init.pt
+  weights: weights/training/dinov3
+pretrained_decoder: weights/training/rgb_k7_init.pt
 source_rgb_route: official_k7_256
 source_rgb_step: 0
 init_checkpoint: null
@@ -70,4 +70,4 @@ experiment_kind: raev2_k7_rgba256
 live_status: true
 initial_previews: true
 log_interval: 10
-torch_weights: weights/torch
+torch_weights: weights/training/torch

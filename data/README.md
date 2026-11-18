@@ -14,6 +14,6 @@ Paths are relative to the manifest. Splits are `train`, `val` or `test`. A `grou
 {"id":"background_0001","path":"../backgrounds/0001.jpg","source":"sa1b","split":"train","allow_flip":true}
 ```
 
-The original adapter cache configuration selects `source=sa1b`; change `background_sources` for your own image pool. For training the codecs, RGB images must be at least the requested resolution. To train without RGB replay, set its probability to zero and record that change to the original protocol.
+The codec trainer samples RGB replay from the training rows in this manifest. RGB images must be at least the requested resolution (256 for K7 or 1024 for K23). To train without RGB replay, set its probability to zero and record that change to the original protocol.
 
 Datasets and private study records are excluded from Git.

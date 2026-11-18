@@ -37,7 +37,8 @@ def resolve_config(config):
     config['dinov3_source'] = str(ROOT / 'third_party/dinov3')
     if 'encoder' in config:
         config['encoder'] = dict(config['encoder'])
-        config['encoder']['weights'] = str(ROOT / 'weights/dinov3')
+        path = Path(config['encoder'].get('weights', 'weights/dinov3')).expanduser()
+        config['encoder']['weights'] = str(path if path.is_absolute() else ROOT / path)
     return config
 
 

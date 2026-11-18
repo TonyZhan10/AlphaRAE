@@ -11,10 +11,10 @@ from alpharae.evaluation.alphavae_protocol import BACKGROUNDS, OfficialMetrics, 
 
 
 class LiveOfficialMetrics:
-    def __init__(self, device):
+    def __init__(self, device, cache_dir=None):
         from alpharae.runtime import ROOT
-        root=ROOT
-        self.metric=OfficialMetrics(device,root/"weights/torch",names=("psnr","ssim","lpips"))
+        cache=Path(cache_dir) if cache_dir else ROOT/"weights/training/torch"
+        self.metric=OfficialMetrics(device,cache,names=("psnr","ssim","lpips"))
         self.directory=tempfile.TemporaryDirectory(prefix=f"rgba_metrics_{os.getpid()}_")
         self.root=Path(self.directory.name)
 

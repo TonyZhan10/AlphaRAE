@@ -267,7 +267,7 @@ def _train(config, output, resume, device):
     official = None
     if config.get("live_official_validation"):
         from alpharae.evaluation.live_official import LiveOfficialMetrics
-        official=LiveOfficialMetrics(device)
+        official=LiveOfficialMetrics(device, config.get("torch_weights"))
     bf16 = device.type == "cuda" and config.get("bf16", True)
     validation_bf16 = bf16 and config.get("validation_precision", "bf16") != "fp32"
     alpha_structure = config.get("validate_alpha_structure", False)
