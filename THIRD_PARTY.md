@@ -1,0 +1,7 @@
+# Third-party code and model attribution
+
+- **RAE** — Boyang Zheng and collaborators, https://github.com/bytetriper/RAE. The original MIT notice is retained in `LICENSE`.
+- **RAEv2: Improved Baselines with Representation Autoencoders** — https://github.com/nanovisionx/RAEv2 — Jaskirat Singh, Boyang Zheng, Zongze Wu, Richard Zhang, Eli Shechtman and Saining Xie. Runtime subsets for vision encoders, ViT decoder and reconstruction configuration are retained under `third_party/RAEv2`. Its CC BY-NC 4.0 license is retained verbatim. The DINOv3 loader is adapted to explicit local ViT-L architecture construction. Complete AlphaRAE checkpoints load their own encoder state, so a separate upstream checkpoint is unnecessary for reconstruction inference. No downloader or training/evaluation logging infrastructure is included.
+- **DINOv3** — Meta Platforms, Inc. and affiliates, https://github.com/facebookresearch/dinov3. ViT-L, attention/MLP layers and the runtime tensor helpers are retained under `third_party/dinov3`. Its `LICENSE.md` is retained verbatim. Model/training registries and unrelated utilities are omitted from the runtime subset. The model source files retain their copyright notices.
+
+Model weights keep their original licenses. Root-level licensing does not grant additional rights to upstream code, pretrained weights, or image corpora. The release does not include the original data collections, private preference-study records, or authentication material.

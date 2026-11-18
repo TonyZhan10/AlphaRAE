@@ -1,0 +1,73 @@
+model_type: raev2_joint_full
+variant: B1
+model_revision: pure_rgb_joint_full_v1
+training_scope: fresh_rgb_full_sft
+fresh_rgb_full: true
+manifest: data/rgba_manifest.jsonl
+encoder:
+  kind: dinov3l_k23
+  resolution: 1024
+  weights: weights/dinov3
+pretrained_decoder: weights/rgb_k23_init.pt
+source_rgb_route: direct_1024_b
+source_rgb_step: 12500
+init_checkpoint: null
+initial_step: 0
+decoder_train_mode: full
+decoder_gradient_checkpointing: true
+alpha_scale: 0.1
+alpha_stride: 8
+alpha_channels: 16
+latent_channels: 1088
+joint_detail_rgb: true
+rgb_residual_scale: 0.1
+seed: 20260928
+device: cuda
+cpu_threads: 2
+num_workers: 2
+batch_size: 1
+effective_batch_size: 8
+planned_world_size: 8
+epochs: 52
+steps: 50000
+eval_every: 2000
+checkpoint_milestones: []
+validation_samples: 6
+lr: 2.0e-06
+alpha_lr: 0.0002
+lr_scheduler: constant_with_warmup
+lr_warmup_steps: 100
+weight_decay: 0.01
+train_shift_pixels: 8
+bf16: true
+grad_clip: 10.0
+validation_precision: fp32
+validate_alpha_structure: true
+live_official_validation: true
+loss:
+  alpha: 1.0
+  composition: 1.0
+  composition_mode: analytic_uniform
+  perceptual: 0.5
+  alpha_detail: 1.0
+fidelity_loss:
+  composition_weight: 1000.0
+  alpha_weight: 200.0
+  edge_weight: 50.0
+  gradient_weight: 80.0
+  perceptual_weight: 6.0
+fresh_arm: readout_balanced
+residual_interpolation: true
+background_blend_probability: 0.2
+rgb_replay_probability: 0.2
+rgb_replay_manifest: data/rgb_replay.jsonl
+lr_tail:
+  start_step: 35000
+  end_step: 45000
+  min_lr_ratio: 0.1
+loo_arm: full
+experiment_kind: raev2_rgba1024
+live_status: true
+initial_previews: true
+log_interval: 10
+torch_weights: weights/torch
