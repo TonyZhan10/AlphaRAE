@@ -35,3 +35,13 @@ Both configurations were exercised with `scripts.launch_train` on eight A800 GPU
 The GPU tests ran without Internet access. Training bundle files were staged to the isolated directories; the complete published bundle was also anonymously downloaded on the connected host and byte-compared. The small LPIPS calibration file distributed inside the installed LPIPS package is a standard dependency asset, while the AlexNet trunk and PyIQA calibration use the downloaded training cache. No diffusion prior or generation adapter was present or accessed.
 
 The tested environment also passed existing-dependency editable installation, and the pinned PyIQA 0.1.16 release was confirmed on the official PyPI index. A fresh network installation of all dependencies and full 50k convergence training are not claimed as tested.
+
+## ImageNet class-conditioned RGBA generation
+
+The restored public pipeline uses the selected K7 RGB DiT EMA, image-only adapter EMA and matching normalization. All exported model tensors exactly match their original sources. The reused RGB decoder initializer was also compared against the native RGB decoder: all 456 state tensors match.
+
+The class-generation CLI ran on one A800 with classes 985/849 and seeds 20260926/20261118. All four 256×256 RGBA outputs are pixel-identical and PNG-byte-identical to the preserved original pipeline references. The existing reconstruction entrypoint also completed successfully with the restored sampling runtime. The anonymous download script fetched all new generation files and shared dependencies; downloaded model files exactly match the upload exports.
+
+The pipeline accepts only ImageNet class IDs and random seeds. It samples RGB first, then predicts the RGBA decoder input. It does not access target images, alpha labels, a matting teacher or a text-conditioned model. These are engineering and qualitative sample checks, not a new ImageNet benchmark or a success-rate estimate.
+
+An independent agent installed the existing-dependency editable package and ran the README generation command unchanged in an isolated GPU directory using only the five public model files. Both 256×256 RGBA outputs match the primary test pixels and PNG bytes exactly. The executed source uses strict state loading for the prior/adapter/codec/RGB decoder, whose saved state counts are 572/217/842/456. GPU-side execution was offline; the connected parent had separately verified anonymous downloads and transferred those exact files. No text model, dataset, target image or teacher was used.

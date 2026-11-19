@@ -2,7 +2,7 @@
 
 **Joint Color and Opacity Modeling with Representation Autoencoders**
 
-RGBA reconstruction with a frozen DINOv3-L encoder and a trained joint color-opacity decoder. This release provides **K7 at 256×256** and **K23 at 1024×1024**, reconstruction inference, and codec training.
+RGBA reconstruction with a frozen DINOv3-L encoder and a trained joint color-opacity decoder. This release provides **K7 at 256×256** and **K23 at 1024×1024**, reconstruction inference, codec training, and ImageNet class-conditioned RGBA generation.
 
 ## Installation
 
@@ -56,6 +56,21 @@ python -m scripts.infer --codec k23 --input examples/rgba.png --output outputs/r
 ```
 
 Replace `examples/rgba.png` with your straight-alpha, 8-bit RGBA PNG. The included example is a procedural test asset. Images are resized with premultiplied alpha and padded to the selected square resolution. The loader uses linear RGB internally; saved RGBA PNGs use sRGB and straight alpha. Output folders contain reconstruction RGBA, foreground RGB, alpha, black/white/checkerboard views, and `report.json`. Use `--device cpu` for CPU inference or `--weights-dir /path/to/weights` for a custom model directory.
+
+## ImageNet class-conditioned RGBA generation
+
+The public class-generation models are at [TonyZhan/AlphaRAE-ImageNet](https://huggingface.co/TonyZhan/AlphaRAE-ImageNet). Download the pipeline assets and sample by class ID:
+
+```bash
+python -m scripts.download_generation_weights
+python -m scripts.generate_imagenet --classes 985 849 --seeds 20260926 --output outputs/imagenet
+```
+
+Class IDs range from 0 to 999 in torchvision ImageNet order (`985`: daisy; `849`: teapot). Multiple classes and seeds produce their full Cartesian product. The unchanged K7 RGB DiT samples first; an image-only adapter then supplies the frozen RGBA decoder's input. The pipeline returns 256×256 RGBA assets and does not read text, a target image, target alpha or a matting teacher.
+
+The downloader saves the RGB prior, selected adapter EMA and matching statistics under `weights/generation/`. It automatically reuses/downloads the K7 reconstruction codec and `training/rgb_k7_init.pt` for the RGB decoder. Public downloads require no token. Sampling uses 100 Euler steps, CFG 1 and internal guidance 1.78 on [0.1,1]. The adapter's final 8k stage belongs to a 47.5k sequential training path. Text-to-RGBA code and models remain outside this release.
+
+Output includes native RGB, straight-alpha RGBA, alpha, black/white/checkerboard views and `report.json`. On offline GPU nodes, download on a connected machine and copy the entire `weights/` directory before running the generator.
 
 ## Data preparation
 

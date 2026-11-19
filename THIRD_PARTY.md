@@ -7,3 +7,5 @@
 Model weights keep their original licenses. Root-level licensing does not grant additional rights to upstream code, pretrained weights, or image corpora. The release does not include the original data collections, private preference-study records, or authentication material.
 
 Training initialization also uses the Torchvision AlexNet trunk, Richard Zhang and collaborators' LPIPS calibration weights, and IQA-PyTorch for the paired evaluation implementation. Their license notices are provided with the downloadable training assets under `weights/training/`. IQA-PyTorch required notice: Copyright (c) 2022 Chaofeng Chen. These caches serve reconstruction losses and validation; no text-conditioned generator is included.
+
+The ImageNet class-generation release also includes the RAEv2 DDT model, Euler transport and guidance runtime under its retained CC BY-NC 4.0 license. Its public configuration subset contains only the class-sampling types needed by this pipeline; no AlphaRAE text encoder, text-transfer pipeline or text-conditioned weights are distributed.
